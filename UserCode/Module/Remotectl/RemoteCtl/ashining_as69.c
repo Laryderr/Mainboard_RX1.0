@@ -32,7 +32,14 @@ void AS69_RemoteControl_Init()
 
 
 /**
- * @brief   遥控器LED灯信息发送函数
+ * @brief 遥控器LED信息发送函数
+ * 
+ * @param r <   range: [0, 1] 
+ * @param g     range: [0, 1]
+ * @param b     range: [0, 1]
+ * @param lightness Gain of lightness. Must be positive values
+ * @param duration  Led will be on for this milliseconds
+ * @param msg_joystick_air_led 
  */
 void JoystickSwitchLED(float r, float g, float b, float lightness, uint16_t duration, mavlink_joystick_air_led_t *msg_joystick_air_led)
 {

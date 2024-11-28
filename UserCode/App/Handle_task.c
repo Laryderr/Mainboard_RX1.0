@@ -42,15 +42,38 @@ void my_handle_Task_Start(void)
  */
 void my_handle_Task(void *arguement)
 {
-    //动作线程启动
+    Handle_Dunk_TaskStart();
 
+    //动作线程启动
+    myHandle_State = HANDLE_IDLE_MODE;
     for(;;)
     {
+        if (MyRemote_Data.btn_Btn0 == 1 )
+        {
+            if (myHandle_State == HANDLE_IDLE_MODE)
+            {
+                myHandle_State = HANDLE_DUNK_MODE;
+                
+            }
+        }
+        if (MyRemote_Data.btn_Btn1 == 1 )
+        {
+            if (myHandle_State == HANDLE_DUNK_MODE)
+            {
+                myHandle_State = HANDLE_IDLE_MODE;
+                
+            }
+        }
+        
         switch (myHandle_State)
         {
         case HANDLE_IDLE_MODE:
+            JoystickSwitchTitle(ID_MODE, mode_title, &mav_mode_title);
+            JoystickSwitchMsg(ID_MODE, mode_idle_msg, &mav_mode_msg);
             break;
         case HANDLE_DUNK_MODE:
+            JoystickSwitchTitle(ID_MODE, mode_title, &mav_mode_title);
+            JoystickSwitchMsg(ID_MODE, mode_dunk_msg, &mav_mode_msg);
             break;
         case HANDLE_INTERCEPT_MODE:
             break;

@@ -21,12 +21,13 @@
 #include "cmsis_os.h"
 #include "can.h"
 #include "dma.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "usermain.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -94,13 +95,11 @@ int main(void)
   MX_DMA_Init();
   MX_CAN1_Init();
   MX_CAN2_Init();
-  MX_USART1_UART_Init();
   MX_USART6_UART_Init();
   MX_UART8_Init();
-  MX_USART3_UART_Init();
-  MX_UART7_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-
+  //my_Chassis_Init();      //底盘运动电机初始化
   /* USER CODE END 2 */
 
   /* Init scheduler */

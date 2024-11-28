@@ -38,11 +38,11 @@ typedef enum{
  * 
  */
 typedef enum {
-    CORRECTING,//校正
-    RUNNING,   //运行
-    STOP,
-    ERROR_
-} Alldir_wheel_state_e; 
+    WHEEL_RUNNING,   //运行
+    WHEEL_CORRECTING,//校正
+    WHEEL_READY,
+    WHEEL_STOP,
+    WHEEL_ERROR} Alldir_wheel_state_e; 
 
 /**
  * @brief 底盘PID结构体
@@ -84,7 +84,7 @@ typedef struct
 {
     uint8_t id;                 //每个全向轮id
     Alldir_wheel_state_e state; //全向轮当前状态
-    float target_v;             //遥控器 / 上位机获取
+    float target_v;             //遥控器 / 上位机获取,单位rpm
     float current_v;            //码盘获取
     int16_t correcting_stage;
 }Alldir_wheel_t;
@@ -116,7 +116,7 @@ void my_Chassis_CAN_Message_TaskStart(void);
 void my_Chassis_Ctrl_TaskStart(void);
 
 
-void Inverse_kinematic_equation(Alldir_Chassis_t this_chassis);
+void Inverse_kinematic_equation(Alldir_Chassis_t *this_chassis);
 
 
 #ifdef __cplusplus

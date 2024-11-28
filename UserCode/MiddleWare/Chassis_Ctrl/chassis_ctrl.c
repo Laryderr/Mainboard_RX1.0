@@ -27,7 +27,7 @@ osThreadId_t can_message_TaskHandle;
 const osThreadAttr_t can_message_Task_attributes = {
     .name       = "can_message_Task",
     .stack_size = 256 * 4,
-    .priority   = (osPriority_t)osPriorityHigh1,
+    .priority   = (osPriority_t)osPriorityNormal,
 };
 void my_CAN_Message_Task(void *argument);
 
@@ -35,7 +35,7 @@ osThreadId_t chassis_ctrl_TaskHandle;
 const osThreadAttr_t chassis_ctrl_Task_attributes = {
     .name       = "chassis_ctrl_Task",
     .stack_size = 256 * 4,
-    .priority   = (osPriority_t)osPriorityHigh1,
+    .priority   = (osPriority_t)osPriorityNormal,
 };
 void my_Chassis_Ctrl_Task(void *argument);
 
@@ -47,6 +47,7 @@ void my_Chassis_Ctrl_Task(void *argument);
 //float wheel0_velocity, wheel1_velocity, wheel2_velocity;            //底盘目标电机速度
 
 Alldir_Chassis_t my_Alldir_Chassis_t;
+float v0,v1,v2;
 
 /***********************************************************
  * @brief 底盘整体运动控制
@@ -60,6 +61,7 @@ Alldir_Chassis_t my_Alldir_Chassis_t;
  */
 void my_Chassis_Init(void)
 {
+    //注意cube里的can引脚配置
     CANFilterInit(&hcan1);
     CAN2FilterInit(&hcan2);
     for (int i = 0; i < 4; i++){
@@ -69,10 +71,11 @@ void my_Chassis_Init(void)
     for (int i = 0; i < 4; i++) {
         hDJI[i].posPID.KI=1.5;
         hDJI[i].posPID.KD=0;
-        hDJI[i].speedPID.outputMax=8000;
-        hDJI[i].speedPID.KI=0.02;
-        hDJI[i].speedPID.KD=0.1;
-        hDJI[i].speedPID.KP=0.8;
+        hDJI[i].speedPID.outputMax=5000;
+        hDJI[i].speedPID.KP=1.45;
+        hDJI[i].speedPID.KI=0.01;
+        hDJI[i].speedPID.KD=0.3;
+        
     }    
 }
 
@@ -92,6 +95,8 @@ void my_Chassis_Ctrl_TaskStart(void)
     chassis_ctrl_TaskHandle = osThreadNew(my_Chassis_Ctrl_Task, NULL, &chassis_ctrl_Task_attributes);
 }
 
+
+
 /**************************************************************
  * @brief 线程函数，底盘电机CAN发送消息线程
  * 
@@ -101,11 +106,14 @@ void my_CAN_Message_Task(void *arguement)
 {
     for(;;)
     {
-        speedServo(my_Alldir_Chassis_t.my_wheel[0].target_v,&hDJI[0]);
-        speedServo(my_Alldir_Chassis_t.my_wheel[1].target_v,&hDJI[1]);
-        speedServo(my_Alldir_Chassis_t.my_wheel[2].target_v,&hDJI[2]);
-        CanTransmit_DJI_1234(&hcan1,hDJI[0].speedPID.output,hDJI[1].speedPID.output,hDJI[2].speedPID.output,hDJI[3].speedPID.output);
-        osDelay(1);
+        //注意速度伺服函数的参数单位
+        speedServo(my_Alldir_Chassis_t.my_wheel[0].target_v * hDJI[0].reductionRate,&hDJI[0]);
+        speedServo(my_Alldir_Chassis_t.my_wheel[1].target_v * hDJI[0].reductionRate,&hDJI[1]);
+        speedServo(my_Alldir_Chassis_t.my_wheel[2].target_v * hDJI[0].reductionRate,&hDJI[2]);
+        CanTransmit_DJI_1234(&hcan1,hDJI[0].speedPID.output,hDJI[1].speedPID.output,hDJI[2].speedPID.output,1000);
+        //CanTransmit_DJI_1234(&hcan1,0,0,0,0);
+        //CanTransmit_DJI_1234(&hcan1,500,hDJI[1].speedPID.output,hDJI[2].speedPID.output,1000);
+        osDelay(2);
     }
 }
 
@@ -118,13 +126,58 @@ void my_Chassis_Ctrl_Task(void *arguement)
 {
     for(;;)
     {
+        if(BtnScan_Press(MyRemote_Data.btn_LeftCrossUp,MyLastRemote_Data.btn_LeftCrossUp))
+        {
+            for (int i = 0; i < 4; i++) {
+            hDJI[i].speedPID.KP = hDJI[i].speedPID.KP + 0.05;
+            }    
+        }
+
+        if(BtnScan_Press(MyRemote_Data.btn_LeftCrossMid,MyLastRemote_Data.btn_LeftCrossMid))
+        {
+            for (int i = 0; i < 4; i++) {
+            hDJI[i].speedPID.KI = hDJI[i].speedPID.KI + 0.01;
+            }    
+        }
+
+        if(BtnScan_Press(MyRemote_Data.btn_LeftCrossDown,MyLastRemote_Data.btn_LeftCrossDown))
+        {
+            for (int i = 0; i < 4; i++) {
+            hDJI[i].speedPID.KD = hDJI[i].speedPID.KD + 0.05;
+            }    
+        }
+
+        if (BtnScan_Press(MyRemote_Data.btn_RightCrossUp,MyLastRemote_Data.btn_RightCrossUp))
+        {
+            for (int i = 0; i < 4; i++) {
+            hDJI[i].speedPID.KP = hDJI[i].speedPID.KP - 0.05;
+            }   
+        }
+
+        if (BtnScan_Press(MyRemote_Data.btn_RightCrossMid,MyLastRemote_Data.btn_RightCrossMid))
+        {
+            for (int i = 0; i < 4; i++) {
+            hDJI[i].speedPID.KI = hDJI[i].speedPID.KI - 0.01;
+            }   
+        }
+
+        if (BtnScan_Press(MyRemote_Data.btn_RightCrossDown,MyLastRemote_Data.btn_RightCrossDown))
+        {
+            for (int i = 0; i < 4; i++) {
+            hDJI[i].speedPID.KD= hDJI[i].speedPID.KD - 0.05;
+            }   
+        }
+        
+
         if(my_Alldir_Chassis_t.state == CHASSIS_HANDLE_RUNNING)
         {
-            my_Alldir_Chassis_t.target_v.vx = MyRemote_Data.usr_left_y;
-            my_Alldir_Chassis_t.target_v.vy = MyRemote_Data.usr_left_x;
-            my_Alldir_Chassis_t.target_v.vw = MyRemote_Data.usr_right_x;
+            //850->2m/s
+            my_Alldir_Chassis_t.target_v.vy = ((float)MyRemote_Data.usr_left_x)/283.3f ;
+            my_Alldir_Chassis_t.target_v.vx = ((float)MyRemote_Data.usr_left_y)/283.3f * (-1.0f);
+            my_Alldir_Chassis_t.target_v.vw = ((float)MyRemote_Data.usr_right_x)/230.0f;
         }
-        Inverse_kinematic_equation(my_Alldir_Chassis_t);
+        Inverse_kinematic_equation(&my_Alldir_Chassis_t);
+        osDelay(2);
     }
 }
 
@@ -138,15 +191,15 @@ void my_Chassis_Ctrl_Task(void *arguement)
  * @param out_v1    三个输出电机速度,单位rpm
  * @param out_v2 
  */
-void Inverse_kinematic_equation(Alldir_Chassis_t this_chassis)
+void Inverse_kinematic_equation(Alldir_Chassis_t *this_chassis)
 {
-    float v0,v1,v2;
-    v0 = (float)((this_chassis.target_v.vy + this_chassis.target_v.vw * chassis_r) / chassis_R);
-    v1 = (float)((-sqrt(3) * this_chassis.target_v.vx / 2 - this_chassis.target_v.vy / 2 + this_chassis.target_v.vw * chassis_r) / chassis_R);
-    v2 = (float)((sqrt(3) * this_chassis.target_v.vx / 2 - this_chassis.target_v.vy / 2 + this_chassis.target_v.vw * chassis_r) / chassis_R);
+    
+    v0 = (float)((this_chassis->target_v.vy + this_chassis->target_v.vw * chassis_r) / chassis_R);
+    v1 = (float)((-sqrt(3) * this_chassis->target_v.vx / 2 - this_chassis->target_v.vy / 2 + this_chassis->target_v.vw * chassis_r) / chassis_R);
+    v2 = (float)((sqrt(3) * this_chassis->target_v.vx / 2 - this_chassis->target_v.vy / 2 + this_chassis->target_v.vw * chassis_r) / chassis_R);
 
-    this_chassis.my_wheel[0].target_v = mps_to_rpm(v0);
-    this_chassis.my_wheel[1].target_v = mps_to_rpm(v1);
-    this_chassis.my_wheel[2].target_v = mps_to_rpm(v2);
+    this_chassis->my_wheel[0].target_v = mps_to_rpm(v0);
+    this_chassis->my_wheel[1].target_v = mps_to_rpm(v1);
+    this_chassis->my_wheel[2].target_v = mps_to_rpm(v2);
 }
 

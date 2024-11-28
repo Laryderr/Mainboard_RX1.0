@@ -40,3 +40,11 @@ char mode_idle_msg[20] = "IDLEMode";
 char mode_intercept_msg[20] = "INTERCEPTMode";
 char mode_patball_msg[20] = "PATBALLMode";
 char mode_dunk_msg[20] = "DUNKMode";
+
+mavlink_joystick_air_dashboard_set_title_t mav_status_title;
+mavlink_joystick_air_dashboard_set_msg_t mav_status_msg;
+char status_title[20]    = "Status";
+char status_running_msg[20] = "Running";
+char status_ready_msg[20] = "Ready";
+char status_stop_msg[20] = "Stop";
+char status_error_msg[20] = "Error";

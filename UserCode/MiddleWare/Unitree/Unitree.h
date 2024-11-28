@@ -11,7 +11,7 @@ extern "C" {
 #define EXTENDMAX 
 #define EXTENDMIN
 
-extern UnitreeMotor uinitree_DunkMotor_t[3];   //底盘跳跃电机对象创建
+extern UnitreeMotor unitree_DunkMotor_t[16];   //底盘跳跃电机对象创建
 
 extern float unitree_DunkMotor_Tff[3];         //前馈力矩
 extern float uinitree_DunkMotor_posdes[3];        //电机输出轴输出位置（-65051.18 ~ 65051.18  单位 rad）

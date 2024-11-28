@@ -18,7 +18,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     if (huart->Instance == AS69_UART) {
         wtrMavlink_UARTRxCpltCallback(huart, MAVLINK_COMM_0);
-        temp=temp+0.001;
+        //temp=temp+0.001;
     }
    
 
@@ -26,13 +26,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg)
 {
-    temp1 ++;
+    //temp1 ++;
     mavlink_msg_joystick_air_decode(msg, &msg_joystick_air);
 
     switch (msg->msgid) {
         case 209:
             mavlink_msg_joystick_air_decode(msg, &msg_joystick_air);
-            temp1 ++;
+            //temp1 ++;
             break;
         default:
             break;

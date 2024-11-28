@@ -25,8 +25,9 @@ extern "C"{
 #define ID_HANDLE_INTERCEPT 2
 #define ID_HANDLE_PATBALL   2
 #define ID_RUN              3
-#define ID_MODE             4
-#define ID_RST              5
+#define ID_STATUS           4
+#define ID_MODE             5
+#define ID_RST              6
 
 
 
@@ -70,6 +71,13 @@ extern char mode_intercept_msg[20]  ;
 extern char mode_patball_msg[20]  ;
 extern char mode_dunk_msg[20] ;
 
+extern mavlink_joystick_air_dashboard_set_title_t mav_status_title;
+extern mavlink_joystick_air_dashboard_set_msg_t mav_status_msg;
+extern char status_title[20];
+extern char status_running_msg[20];
+extern char status_ready_msg[20];
+extern char status_stop_msg[20];
+extern char status_error_msg[20];
 
 
 

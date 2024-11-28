@@ -19,7 +19,7 @@ void DJI_Init()
 		hDJI[i].speedPID.KP = 12;
 		hDJI[i].speedPID.KI = 0.2;
 		hDJI[i].speedPID.KD = 5;
-		hDJI[i].speedPID.outputMax = 8000;
+		hDJI[i].speedPID.outputMax = 5000;
 
 		// 位置环PID
 		hDJI[i].posPID.KP = 80.0f;
@@ -72,6 +72,7 @@ void CanTransmit_DJI_1234(CAN_HandleTypeDef *hcanx, int16_t cm1_iq, int16_t cm2_
 	{
 		Error_Handler(); // 如果CAN信息发送失败则进入死循环
 	}
+	
 }
 
 /**

@@ -87,7 +87,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan){
         if(HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, CanReceiveData) != HAL_OK)
         {
             Error_Handler();
-        }
+        }                            
         CanDataDecode(RxHeader);
     }
     if(hcan->Instance == hcan2.Instance){

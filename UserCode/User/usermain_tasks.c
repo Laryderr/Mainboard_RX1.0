@@ -64,21 +64,60 @@ int motor_wait_to_finish(float feedback, float setpoint)
 void my_main_Task(void *arguement)
 {
     my_handle_Task_Start();
+
     for(;;)
     {
+        //发送遥控器状态显示面框
+        
+
+        //判断遥控器底盘指令
+        if (MyRemote_Data.left_switch == 1 && my_Alldir_Chassis_t.state != CHASSIS_READY)
+        {
+            my_Alldir_Chassis_t.state = CHASSIS_HANDLE_RUNNING;
+            for (uint8_t i = 0; i < 3; i++)
+            {
+                my_Alldir_Chassis_t.my_wheel[i].state = WHEEL_RUNNING;
+            }
+        }else if(MyRemote_Data.left_switch == 0 && my_Alldir_Chassis_t.state != CHASSIS_READY)
+        {
+            my_Alldir_Chassis_t.state = CHASSIS_STOP;
+            for (uint8_t i = 0; i < 3; i++)
+            {
+                my_Alldir_Chassis_t.my_wheel[i].state = WHEEL_STOP;
+            }
+        }
+        
+        //底盘状态
         switch (my_Alldir_Chassis_t.state)
         {
         case CHASSIS_READY:
-            if (MyRemote_Data.left_switch == 0)
+
+            // Speed & Position Init
+            my_Alldir_Chassis_t.target_v.vx = 0;
+            my_Alldir_Chassis_t.target_v.vy = 0;
+            my_Alldir_Chassis_t.target_v.vw = 0;
+
+            for (uint8_t i = 0; i < 3; i++)
             {
-                my_Alldir_Chassis_t.state = CHASSIS_HANDLE_RUNNING;
+                my_Alldir_Chassis_t.my_wheel[i].state = WHEEL_READY;
             }
+            if(MyRemote_Data.right_switch == 1)
+            {
+                my_Alldir_Chassis_t.state = CHASSIS_STOP;
+            }
+            //显示当前状态
+            JoystickSwitchTitle(ID_STATUS, status_title, &mav_status_title);
+            JoystickSwitchMsg(ID_STATUS, status_ready_msg, &mav_status_msg);
+
             break;
         case CHASSIS_HANDLE_RUNNING:
             //osThreadSuspend(auto_TaskHandle);
-            //osThreadResume(handle_TaskHandle);
-            //JoystickSwitchTitle(ID_RUN, run_title, &mav_run_title);
-            //JoystickSwitchMsg(ID_RUN, run_handle_msg, &mav_run_msg);
+            osThreadResume(handle_TaskHandle);
+            JoystickSwitchTitle(ID_RUN, run_title, &mav_run_title);
+            JoystickSwitchMsg(ID_RUN, run_handle_msg, &mav_run_msg);
+
+            JoystickSwitchTitle(ID_STATUS, status_title, &mav_status_title);
+            JoystickSwitchMsg(ID_STATUS, status_running_msg, &mav_status_msg);
             break;
         case CHASSIS_AUTO_RUNNING :
             break;
@@ -86,11 +125,17 @@ void my_main_Task(void *arguement)
             my_Alldir_Chassis_t.target_v.vx = 0;
             my_Alldir_Chassis_t.target_v.vy = 0;
             my_Alldir_Chassis_t.target_v.vw = 0;
+            
+            JoystickSwitchTitle(ID_STATUS, status_title, &mav_status_title);
+            JoystickSwitchMsg(ID_STATUS, status_stop_msg, &mav_status_msg);
             break;
         case CHASSIS_ERROR:
             my_Alldir_Chassis_t.target_v.vx = 0;
             my_Alldir_Chassis_t.target_v.vy = 0;
             my_Alldir_Chassis_t.target_v.vw = 0;
+
+            JoystickSwitchTitle(ID_STATUS, status_title, &mav_status_title);
+            JoystickSwitchMsg(ID_STATUS, status_error_msg, &mav_status_msg);
             break;
         default:
             break;
