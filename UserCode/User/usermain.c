@@ -25,15 +25,17 @@ void StartDefaultTask(void *arguement)
     //  Hardware Init
     my_Chassis_Init();      //底盘运动电机初始化
     my_RemoteCtrl_Init();   //遥控器初始化
-    //my_Unitree_Init();    //宇树电机初始化
+    my_Unitree_Init();    //宇树电机初始化
     osDelay(100);
 
     //  Tasks Start
-    my_RemoteCtrl_Task_Start(); //开启遥控器线程
-    my_Chassis_CAN_Message_TaskStart();//开启底盘电机消息线程
-    my_Chassis_Ctrl_TaskStart();//开启底盘控制线程
-    //my_Unitree_UART_Message_TaskStart();//开启跳跃电机消息线程
-    //my_unitree_dunk_ctrl_TaskStart();//开启跳跃电机控制线程
+    my_RemoteCtrl_Task_Start();         //开启遥控器线程
+    my_Chassis_CAN_Message_TaskStart(); //开启底盘电机消息线程
+    my_Chassis_Ctrl_TaskStart();        //开启底盘控制线程
+    my_Unitree_UART_Message_TaskStart();//开启跳跃电机消息线程
+    Handle_Dunk_TaskStart();            //开启跳跃电机控制线程
+    my_debug_TaskStart();               //调试线程
+    
 
 
 

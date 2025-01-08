@@ -72,7 +72,7 @@ void my_Chassis_Init(void)
         hDJI[i].posPID.KI=1.5;
         hDJI[i].posPID.KD=0;
         hDJI[i].speedPID.outputMax=5000;
-        hDJI[i].speedPID.KP=1.45;
+        hDJI[i].speedPID.KP=1.7;
         hDJI[i].speedPID.KI=0.01;
         hDJI[i].speedPID.KD=0.3;
         
@@ -126,49 +126,6 @@ void my_Chassis_Ctrl_Task(void *arguement)
 {
     for(;;)
     {
-        if(BtnScan_Press(MyRemote_Data.btn_LeftCrossUp,MyLastRemote_Data.btn_LeftCrossUp))
-        {
-            for (int i = 0; i < 4; i++) {
-            hDJI[i].speedPID.KP = hDJI[i].speedPID.KP + 0.05;
-            }    
-        }
-
-        if(BtnScan_Press(MyRemote_Data.btn_LeftCrossMid,MyLastRemote_Data.btn_LeftCrossMid))
-        {
-            for (int i = 0; i < 4; i++) {
-            hDJI[i].speedPID.KI = hDJI[i].speedPID.KI + 0.01;
-            }    
-        }
-
-        if(BtnScan_Press(MyRemote_Data.btn_LeftCrossDown,MyLastRemote_Data.btn_LeftCrossDown))
-        {
-            for (int i = 0; i < 4; i++) {
-            hDJI[i].speedPID.KD = hDJI[i].speedPID.KD + 0.05;
-            }    
-        }
-
-        if (BtnScan_Press(MyRemote_Data.btn_RightCrossUp,MyLastRemote_Data.btn_RightCrossUp))
-        {
-            for (int i = 0; i < 4; i++) {
-            hDJI[i].speedPID.KP = hDJI[i].speedPID.KP - 0.05;
-            }   
-        }
-
-        if (BtnScan_Press(MyRemote_Data.btn_RightCrossMid,MyLastRemote_Data.btn_RightCrossMid))
-        {
-            for (int i = 0; i < 4; i++) {
-            hDJI[i].speedPID.KI = hDJI[i].speedPID.KI - 0.01;
-            }   
-        }
-
-        if (BtnScan_Press(MyRemote_Data.btn_RightCrossDown,MyLastRemote_Data.btn_RightCrossDown))
-        {
-            for (int i = 0; i < 4; i++) {
-            hDJI[i].speedPID.KD= hDJI[i].speedPID.KD - 0.05;
-            }   
-        }
-        
-
         if(my_Alldir_Chassis_t.state == CHASSIS_HANDLE_RUNNING)
         {
             //850->2m/s

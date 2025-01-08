@@ -31,11 +31,6 @@ extern "C"{
 
 
 
-
-
-
-
-
 #define chassis_R           (152 * 0.001) // 全向轮半径
 #define chassis_r           (293.26 * 0.001) // 底盘半径
 #define PI                  3.1415926

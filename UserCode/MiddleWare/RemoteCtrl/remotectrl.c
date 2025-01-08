@@ -12,7 +12,7 @@
 
 #include "remotectrl.h"
 
-Remote_Data MyRemote_Data;
+Remote_Data MyRemote_Data;      
 Remote_Data MyLastRemote_Data;  
 
 /**********************************************************
@@ -95,15 +95,15 @@ void my_Remotectrl_Task(void *arguement)
         //数据处理
         MyLastRemote_Data.btn_LeftCrossUp     = MyRemote_Data.btn_LeftCrossUp;
         MyLastRemote_Data.btn_LeftCrossDown   = MyRemote_Data.btn_LeftCrossDown;
-        MyLastRemote_Data.btn_LeftCrossLeft   = ReadJoystickButtons(&msg_joystick_air, Btn_LeftCrossLeft);
-        MyLastRemote_Data.btn_LeftCrossRight  = ReadJoystickButtons(&msg_joystick_air, Btn_LeftCrossRight);
+        MyLastRemote_Data.btn_LeftCrossLeft   = MyRemote_Data.btn_LeftCrossLeft;
+        MyLastRemote_Data.btn_LeftCrossRight  = MyRemote_Data.btn_LeftCrossRight;
         MyLastRemote_Data.btn_LeftCrossMid    = MyRemote_Data.btn_LeftCrossMid;
         MyLastRemote_Data.btn_RightCrossUp    = MyRemote_Data.btn_RightCrossUp;
         MyLastRemote_Data.btn_RightCrossDown  = MyRemote_Data.btn_RightCrossDown;
-        MyLastRemote_Data.btn_RightCrossLeft  = ReadJoystickButtons(&msg_joystick_air, Btn_RightCrossLeft);
-        MyLastRemote_Data.btn_RightCrossRight = ReadJoystickButtons(&msg_joystick_air, Btn_RightCrossRight);
+        MyLastRemote_Data.btn_RightCrossLeft  = MyRemote_Data.btn_RightCrossLeft;
+        MyLastRemote_Data.btn_RightCrossRight = MyRemote_Data.btn_RightCrossRight;
         MyLastRemote_Data.btn_RightCrossMid   = MyRemote_Data.btn_RightCrossMid;
-        MyLastRemote_Data.btn_Btn0            = ReadJoystickButtons(&msg_joystick_air, Btn_Btn0);
+        MyLastRemote_Data.btn_Btn0            = MyRemote_Data.btn_Btn0;
         MyLastRemote_Data.btn_Btn1            = ReadJoystickButtons(&msg_joystick_air, Btn_Btn1);
         MyLastRemote_Data.btn_Btn2            = ReadJoystickButtons(&msg_joystick_air, Btn_Btn2);
         MyLastRemote_Data.btn_Btn3            = ReadJoystickButtons(&msg_joystick_air, Btn_Btn3);
@@ -179,7 +179,12 @@ void my_Remotectrl_Task(void *arguement)
         MyLastRemote_Data.usr_right_knob = MyRemote_Data.usr_right_knob;
         MyRemote_Data.usr_left_knob = MyRemote_Data.left_knob - knob_offset[0];
         MyRemote_Data.usr_right_knob = MyRemote_Data.right_knob - knob_offset[1];
-        
+
+        //特殊处理
+        if(MyRemote_Data.usr_right_knob >= 12)
+        {
+            MyRemote_Data.usr_right_knob = 0;
+        }        
 
         JoystickSwitchLED(1,0.5,0,10,2000,&msg_joystick_air_led);
         JoystickSwitchTitle(ID_RUN, run_title, &mav_run_title);
